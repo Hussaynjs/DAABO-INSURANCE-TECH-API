@@ -4,7 +4,7 @@ const CustomError = require('../errors')
 const Token = require('../models/Token')
 const crypto = require('crypto')
 const { createTokenUser,
-    attachCookiesToResponse,sendVerificationEmail, sendResetPassword,hashPassword} = require('../utils')
+    attachCookiesToResponse,sendVerificationEmail, sendResetPassword} = require('../utils')
 
 const register = async(req, res) => {
     
@@ -29,7 +29,7 @@ const register = async(req, res) => {
         throw new CustomError.BadRequestError('email already exist')
     }
  const isFirstUser = await User.countDocuments({}) === 0;
-    const role = isFirstUser ? 'admin' : 'user';
+    const accountType = isFirstUser ? 'admin' : 'individual';
 
     const verificationToken = crypto.randomBytes(40).toString('hex')
 
@@ -41,7 +41,7 @@ const register = async(req, res) => {
         companyName,
         email,
         password,
-        role,
+       accountType,
         verificationToken
     })
 
@@ -122,7 +122,7 @@ const login = async(req, res) => {
         refreshToken = existingToken.refreshToken
         attachCookiesToResponse({res, user:tokenUser, refreshToken})
 
-        res.status(StatusCodes.OK).json({tokenUser})
+        res.status(StatusCodes.OK).json({user})
         return
     }
     refreshToken = crypto.randomBytes(40).toString('hex')
@@ -136,16 +136,12 @@ const login = async(req, res) => {
     attachCookiesToResponse({res, user:tokenUser, refreshToken})
 
     res.status(StatusCodes.OK).json({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        address: user.address,
-        accountType: user.accountType,
-        userId: user._id
+       user
     })
     
 
    
+
 
 }
 

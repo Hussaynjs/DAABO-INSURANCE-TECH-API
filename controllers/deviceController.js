@@ -7,13 +7,15 @@ const fs = require('fs')
 
 const createDevice = async(req, res) => {
     req.body.user = req.user.userId;
-    const device = await (await Device.create(req.body))
+    const device = await  Device.create(req.body)
     res.status(StatusCodes.CREATED).json({device})
 }
 
 const allDevice = async(req, res) => {
 
-   const devices = await Device.find({})
+   const devices = await Device.find({user:req.user.userId})
+
+   
   
    res.status(StatusCodes.OK).json({devices})
 
